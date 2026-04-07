@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ySaHUB</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: var(--tg-theme-bg-color, #ffffff);
+            color: var(--tg-theme-text-color, #000000);
+            padding: 20px;
+            margin: 0;
+        }
+        .container { max-width: 500px; margin: 0 auto; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input {
+            width: 100%; padding: 10px; box-sizing: border-box;
+            border: 1px solid var(--tg-theme-hint-color, #ccc);
+            border-radius: 5px; background-color: var(--tg-theme-bg-color, #fff);
+            color: var(--tg-theme-text-color, #000);
+        }
+        button {
+            width: 100%; padding: 12px; margin-top: 10px;
+            background-color: var(--tg-theme-button-color, #3390ec);
+            color: var(--tg-theme-button-text-color, #ffffff);
+            border: none; border-radius: 5px; font-size: 16px; cursor: pointer;
+        }
+        .error-message { color: red; font-size: 12px; display: none; margin-top: 5px; }
+        #home-section { display: none; text-align: center; margin-top: 50px; }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="register-section">
+        <h2>Sistem Kayıt Formu</h2>
+        <div class="form-group">
+            <label for="fullname">İsim Soyisim</label>
+            <input type="text" id="fullname" required>
+            <div class="error-message" id="error-fullname">İsim Soyisim alanı boş bırakılamaz.</div>
+        </div>
+        <div class="form-group">
+            <label for="phone">Telefon Numarası</label>
+            <input type="tel" id="phone" placeholder="05XXXXXXXXX" required>
+            <div class="error-message" id="error-phone">Geçerli bir telefon numarası giriniz (Örn: 05xxxxxxxxx).</div>
+        </div>
+        <div class="form-group">
+            <label for="email">E-posta Adresi</label>
+            <input type="email" id="email" placeholder="ornek@mail.com" required>
+            <div class="error-message" id="error-email">Geçerli bir e-posta adresi formatı giriniz.</div>
+        </div>
+        <button onclick="submitData()">Kayıt İşlemini Tamamla</button>
+    </div>
+
+    <div class="container" id="home-section">
+        <h2>ySaHUB Ana Sayfa</h2>
+        <p>Kayıt işleminiz başarıyla alındı. Alt yapımız hazırlanmaktadır.</p>
+        <p>Bu pencereyi kapatabilirsiniz.</p>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand(); // Pencereyi tam ekran boyutuna genişlet
+
+        function validatePhone(phone) {
+            const regex = /^05\d{9}$/;
+            return regex.test(phone);
+        }
+
+        function validateEmail(email) {
+            const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return regex.test(email);
+        }
+
+        function submitData() {
+            const fullname = document.getElementById('fullname').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const email = document.getElementById('email').value.trim();
+
+            let isValid = true;
+
+            if (fullname === "") {
+                document.getElementById('error-fullname').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('error-fullname').style.display = 'none';
+            }
+
+            if (!validatePhone(phone)) {
+                document.getElementById('error-phone').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('error-phone').style.display = 'none';
+            }
+
+            if (!validateEmail(email)) {
+                document.getElementById('error-email').style.display = 'block';
+                isValid = false;
+            } else {
+                document.getElementById('error-email').style.display = 'none';
+            }
+
+            if (isValid) {
+                const payload = {
+                    action: "register",
+                    fullname: fullname,
+                    phone: phone,
+                    email: email
+                };
+
+                document.getElementById('register-section').style.display = 'none';
+                document.getElementById('home-section').style.display = 'block';
+
+                tg.sendData(JSON.stringify(payload));
+            }
+        }
+    </script>
+</body>
+</html>
