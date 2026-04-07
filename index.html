@@ -135,49 +135,55 @@
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand(); 
-
-        // Sayfa yüklendiğinde kullanıcının cihazında kayıtlı olup olmadığını kontrol et
+        
         window.onload = function() {
-            if (localStorage.getItem("ysahub_registered") === "true") {
+            // Bot tarafından URL'ye eklenen parametreyi yakala
+            const urlParams = new URLSearchParams(window.location.search);
+            const isRegistered = urlParams.get('reg');
+        
+            if (isRegistered === '1') {
+                // Parametre 1 ise doğrudan kontrol panelini aç
                 document.getElementById('register-section').style.display = 'none';
                 document.getElementById('dashboard-section').style.display = 'block';
+            } else {
+                // Parametre 0 ise veya yoksa, hata önlemek için önbelleği sil ve formu göster
+                localStorage.removeItem("ysahub_registered");
+                document.getElementById('register-section').style.display = 'block';
+                document.getElementById('dashboard-section').style.display = 'none';
             }
         };
-
+        
         function validatePhone(phone) {
             return /^05\d{9}$/.test(phone);
         }
-
+        
         function validateEmail(email) {
             return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
         }
-
+        
         function submitData() {
             const fullname = document.getElementById('fullname').value.trim();
             const phone = document.getElementById('phone').value.trim();
             const email = document.getElementById('email').value.trim();
             let isValid = true;
-
+        
             if (fullname === "") { document.getElementById('error-fullname').style.display = 'block'; isValid = false; } 
             else { document.getElementById('error-fullname').style.display = 'none'; }
-
+        
             if (!validatePhone(phone)) { document.getElementById('error-phone').style.display = 'block'; isValid = false; } 
             else { document.getElementById('error-phone').style.display = 'none'; }
-
+        
             if (!validateEmail(email)) { document.getElementById('error-email').style.display = 'block'; isValid = false; } 
             else { document.getElementById('error-email').style.display = 'none'; }
-
+        
             if (isValid) {
                 const payload = { action: "register", fullname: fullname, phone: phone, email: email };
                 
-                // Tarayıcı belleğine kayıt edildi bilgisini ekle
-                localStorage.setItem("ysahub_registered", "true");
-
-                // Arayüzü hemen değiştir
+                // Arayüzü hemen kontrol paneline çevir
                 document.getElementById('register-section').style.display = 'none';
                 document.getElementById('dashboard-section').style.display = 'block';
-
-                // Veriyi bota gönder
+        
+                // Veriyi bota göndererek veritabanına işlenmesini sağla
                 tg.sendData(JSON.stringify(payload));
             }
         }
