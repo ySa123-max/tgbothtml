@@ -7,36 +7,24 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
     <style>
+        /* CSS AYARLARI (Bir Öncekiyle Aynı Yapı) */
         :root {
-            --bg-dark: #0a0a10;
-            --panel-bg: #151522;
-            --neon-cyan: #00f3ff;
-            --neon-purple: #b026ff;
-            --text-light: #e0e0e0;
-            --text-muted: #8b8b9e;
+            --bg-dark: #0a0a10; --panel-bg: #151522; --neon-cyan: #00f3ff;
+            --neon-purple: #b026ff; --text-light: #e0e0e0; --text-muted: #8b8b9e;
             --error-red: #ff3b30;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg-dark);
-            color: var(--text-light);
-            margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
+            font-family: 'Inter', sans-serif; background-color: var(--bg-dark);
+            color: var(--text-light); margin: 0; padding: 20px; box-sizing: border-box;
             background-image: radial-gradient(circle at top right, rgba(0, 243, 255, 0.05), transparent 40%),
                               radial-gradient(circle at bottom left, rgba(176, 38, 255, 0.05), transparent 40%);
         }
 
         .container {
-            max-width: 100%;
-            background-color: var(--panel-bg);
-            border-radius: 16px;
-            padding: 25px;
-            border: 1px solid rgba(0, 243, 255, 0.2);
-            box-shadow: 0 0 20px rgba(0, 243, 255, 0.05);
-            position: relative;
-            overflow: hidden;
+            max-width: 100%; background-color: var(--panel-bg); border-radius: 16px;
+            padding: 25px; border: 1px solid rgba(0, 243, 255, 0.2);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.05); position: relative; overflow: hidden;
         }
 
         .container::before {
@@ -45,188 +33,179 @@
         }
 
         h2 { 
-            font-family: 'Rajdhani', sans-serif; font-size: 28px; 
-            margin-top: 0; color: #ffffff; text-transform: uppercase;
-            letter-spacing: 1px; text-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+            font-family: 'Rajdhani', sans-serif; font-size: 28px; margin-top: 0; 
+            color: #ffffff; text-transform: uppercase; text-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
         }
         
         p { color: var(--text-muted); font-size: 14px; margin-bottom: 25px; line-height: 1.5; }
 
-        .secure-badge {
-            display: inline-flex; align-items: center; gap: 5px;
-            background: rgba(0, 255, 102, 0.1); color: #00ff66;
-            padding: 5px 10px; border-radius: 20px; font-size: 11px;
-            font-weight: bold; margin-bottom: 20px; border: 1px solid rgba(0, 255, 102, 0.3);
-        }
-
         .form-group { margin-bottom: 18px; }
         
         label { 
-            display: block; margin-bottom: 8px; 
-            font-size: 13px; font-weight: 500; color: var(--neon-cyan);
-            text-transform: uppercase; letter-spacing: 0.5px;
+            display: block; margin-bottom: 8px; font-size: 13px; font-weight: 500; 
+            color: var(--neon-cyan); text-transform: uppercase;
         }
         
-        input {
+        input, select, textarea {
             width: 100%; padding: 14px; box-sizing: border-box;
             border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px;
             background-color: rgba(0, 0, 0, 0.5); color: #ffffff;
-            font-size: 15px; outline: none; transition: all 0.3s ease;
+            font-size: 15px; outline: none; transition: all 0.3s ease; font-family: 'Inter', sans-serif;
         }
         
-        input:focus { 
-            border-color: var(--neon-cyan); 
-            box-shadow: 0 0 10px rgba(0, 243, 255, 0.2); 
+        input:focus, select:focus, textarea:focus { 
+            border-color: var(--neon-cyan); box-shadow: 0 0 10px rgba(0, 243, 255, 0.2); 
         }
+
+        textarea { resize: none; }
 
         button {
             width: 100%; padding: 16px; margin-top: 15px;
             background: linear-gradient(90deg, var(--neon-purple), var(--neon-cyan));
             color: #ffffff; border: none; border-radius: 8px; 
             font-size: 16px; font-weight: 700; font-family: 'Rajdhani', sans-serif;
-            text-transform: uppercase; letter-spacing: 1px; cursor: pointer; 
-            transition: all 0.3s; box-shadow: 0 4px 15px rgba(0, 243, 255, 0.3);
+            text-transform: uppercase; cursor: pointer; transition: all 0.3s;
         }
+        
+        button:active { transform: scale(0.98); }
+        .btn-outline { background: transparent; border: 1px solid var(--neon-purple); color: var(--neon-purple); }
 
-        button:active { transform: scale(0.98); box-shadow: 0 2px 10px rgba(0, 243, 255, 0.2); }
+        .error-message { color: var(--error-red); font-size: 12px; display: none; margin-top: 6px; }
 
-        .error-message { 
-            color: var(--error-red); font-size: 12px; 
-            display: none; margin-top: 6px; 
-        }
-
-        /* Kontrol Paneli Tasarımı */
         .dashboard-header {
             display: flex; justify-content: space-between; align-items: center;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1); padding-bottom: 15px; margin-bottom: 20px;
         }
 
-        .dashboard-header h2 { margin: 0; font-size: 24px; }
-        .status-dot { width: 10px; height: 10px; background: #00ff66; border-radius: 50%; box-shadow: 0 0 8px #00ff66; }
-
-        .dashboard-grid {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
-        }
+        .dashboard-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         
         .dashboard-card {
-            background-color: rgba(0, 0, 0, 0.3); padding: 20px;
-            border-radius: 12px; text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: all 0.3s;
+            background-color: rgba(0, 0, 0, 0.3); padding: 20px; border-radius: 12px; 
+            text-align: center; border: 1px solid rgba(255, 255, 255, 0.05); cursor: pointer;
         }
-
-        .dashboard-card:hover {
-            border-color: rgba(176, 38, 255, 0.5);
-            background-color: rgba(176, 38, 255, 0.05);
-        }
-
-        .dashboard-card h3 { 
-            margin: 0; font-size: 18px; color: #ffffff; 
-            font-family: 'Rajdhani', sans-serif; 
-        }
-        
+        .dashboard-card:hover { border-color: rgba(176, 38, 255, 0.5); background-color: rgba(176, 38, 255, 0.05); }
+        .dashboard-card h3 { margin: 0; font-size: 18px; font-family: 'Rajdhani', sans-serif; }
         .dashboard-card p { margin: 8px 0 0; font-size: 13px; color: var(--neon-cyan); font-weight: bold; }
 
-        #dashboard-section { display: none; }
+        /* Bölüm Görünürlükleri */
+        #dashboard-section, #support-section { display: none; }
     </style>
 </head>
 <body>
 
     <div class="container" id="register-section">
-        <div class="secure-badge">🔒 256-Bit Güvenli Bağlantı</div>
         <h2>Sistem Kaydı</h2>
-        <p>ySaHUB ekosistemine katılmak ve ilerlemenizi kaydetmek için bilgilerinizi doğrulayın.</p>
-        
         <div class="form-group">
-            <label for="fullname">Kullanıcı Adı / İsim Soyisim</label>
+            <label>Kullanıcı Adı / İsim Soyisim</label>
             <input type="text" id="fullname" required>
-            <div class="error-message" id="error-fullname">Bu alan boş bırakılamaz.</div>
         </div>
         <div class="form-group">
-            <label for="phone">Telefon Numarası</label>
+            <label>Telefon Numarası</label>
             <input type="tel" id="phone" placeholder="05XXXXXXXXX" required>
-            <div class="error-message" id="error-phone">Geçerli bir telefon formatı giriniz.</div>
         </div>
         <div class="form-group">
-            <label for="email">E-posta Adresi</label>
-            <input type="email" id="email" placeholder="ornek@mail.com" required>
-            <div class="error-message" id="error-email">Geçerli bir e-posta adresi giriniz.</div>
+            <label>E-posta Adresi</label>
+            <input type="email" id="email" required>
         </div>
-        <button onclick="submitData()">Sisteme Entegre Ol</button>
+        <button onclick="submitRegister()">Sisteme Entegre Ol</button>
     </div>
 
     <div class="container" id="dashboard-section">
         <div class="dashboard-header">
             <h2>ySaHUB Paneli</h2>
-            <div class="status-dot"></div>
         </div>
-        <p>Sistem aktif. Veri akışı sağlanıyor.</p>
-        
         <div class="dashboard-grid">
-            <div class="dashboard-card">
-                <h3>Bakiye</h3>
-                <p>0.00 TL</p>
-            </div>
-            <div class="dashboard-card">
-                <h3>Seviye</h3>
-                <p>1. Seviye</p>
-            </div>
-            <div class="dashboard-card">
-                <h3>Görevler</h3>
-                <p>Veri Bekleniyor</p>
-            </div>
-            <div class="dashboard-card">
-                <h3>Ayarlar</h3>
-                <p>Modüller</p>
-            </div>
+            <div class="dashboard-card"><h3>Bakiye</h3><p>0.00 TL</p></div>
+            <div class="dashboard-card"><h3>Seviye</h3><p>1. Seviye</p></div>
+            <div class="dashboard-card"><h3>Görevler</h3><p>Veri Bekleniyor</p></div>
+            <div class="dashboard-card" onclick="openSupport()"><h3>Destek</h3><p>Talep Oluştur</p></div>
         </div>
+    </div>
+
+    <div class="container" id="support-section">
+        <div class="dashboard-header">
+            <h2>Destek Merkezi</h2>
+        </div>
+        
+        <div id="support-form-area">
+            <div class="form-group">
+                <label>Sorun Kategorisi</label>
+                <select id="support-type">
+                    <option value="Teknik">Teknik Altyapı</option>
+                    <option value="Finansal">Finansal İşlemler</option>
+                    <option value="Hesap">Hesap Yönetimi</option>
+                    <option value="Diger">Diğer</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Mesajınız (Maks. 200 Karakter)</label>
+                <textarea id="support-msg" rows="4" maxlength="200" placeholder="Sorununuzu detaylandırın..."></textarea>
+                <div id="char-count" style="text-align: right; font-size: 11px; color: var(--text-muted); margin-top: 5px;">0 / 200</div>
+            </div>
+            <button onclick="submitSupport()">Talebi Gönder</button>
+        </div>
+
+        <div id="support-locked-msg" style="display: none; text-align: center; color: var(--neon-cyan); margin: 30px 0;">
+            ⏳ Destek ekibine iletilen açık bir talebiniz var. Yeni bir mesaj göndermek için yanıt bekleniyor...
+        </div>
+
+        <button class="btn-outline" onclick="backToDashboard()">Geri Dön</button>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
-        tg.expand(); 
-        tg.setHeaderColor('#0a0a10');
-        tg.setBackgroundColor('#0a0a10');
+        tg.expand(); tg.setHeaderColor('#0a0a10'); tg.setBackgroundColor('#0a0a10');
+
+        let currentTurn = 'user';
 
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
             const isRegistered = urlParams.get('reg');
+            currentTurn = urlParams.get('turn') || 'user';
 
             if (isRegistered === '1') {
                 document.getElementById('register-section').style.display = 'none';
                 document.getElementById('dashboard-section').style.display = 'block';
-            } else {
-                document.getElementById('register-section').style.display = 'block';
-                document.getElementById('dashboard-section').style.display = 'none';
             }
         };
 
-        function validatePhone(phone) {
-            return /^05\d{9}$/.test(phone);
+        // Karakter Sayacı
+        document.getElementById('support-msg').addEventListener('input', function() {
+            document.getElementById('char-count').innerText = this.value.length + ' / 200';
+        });
+
+        // Sayfa Geçişleri
+        function openSupport() {
+            document.getElementById('dashboard-section').style.display = 'none';
+            document.getElementById('support-section').style.display = 'block';
+            
+            // Eğer sıra yöneticideyse formu gizle, uyarıyı göster
+            if (currentTurn === 'admin') {
+                document.getElementById('support-form-area').style.display = 'none';
+                document.getElementById('support-locked-msg').style.display = 'block';
+            }
         }
 
-        function validateEmail(email) {
-            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        function backToDashboard() {
+            document.getElementById('support-section').style.display = 'none';
+            document.getElementById('dashboard-section').style.display = 'block';
         }
 
-        function submitData() {
+        function submitRegister() {
             const fullname = document.getElementById('fullname').value.trim();
             const phone = document.getElementById('phone').value.trim();
             const email = document.getElementById('email').value.trim();
-            let isValid = true;
+            if(fullname && phone && email) {
+                tg.sendData(JSON.stringify({ action: "register", fullname: fullname, phone: phone, email: email }));
+            }
+        }
 
-            if (fullname === "") { document.getElementById('error-fullname').style.display = 'block'; isValid = false; } 
-            else { document.getElementById('error-fullname').style.display = 'none'; }
-
-            if (!validatePhone(phone)) { document.getElementById('error-phone').style.display = 'block'; isValid = false; } 
-            else { document.getElementById('error-phone').style.display = 'none'; }
-
-            if (!validateEmail(email)) { document.getElementById('error-email').style.display = 'block'; isValid = false; } 
-            else { document.getElementById('error-email').style.display = 'none'; }
-
-            if (isValid) {
-                const payload = { action: "register", fullname: fullname, phone: phone, email: email };
-                tg.sendData(JSON.stringify(payload));
+        function submitSupport() {
+            const type = document.getElementById('support-type').value;
+            const message = document.getElementById('support-msg').value.trim();
+            
+            if(message.length > 0) {
+                tg.sendData(JSON.stringify({ action: "support", type: type, message: message }));
             }
         }
     </script>
