@@ -7,7 +7,6 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        /* CSS AYARLARI (Bir Öncekiyle Aynı Yapı) */
         :root {
             --bg-dark: #0a0a10; --panel-bg: #151522; --neon-cyan: #00f3ff;
             --neon-purple: #b026ff; --text-light: #e0e0e0; --text-muted: #8b8b9e;
@@ -46,18 +45,16 @@
             color: var(--neon-cyan); text-transform: uppercase;
         }
         
-        input, select, textarea {
+        input {
             width: 100%; padding: 14px; box-sizing: border-box;
             border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px;
             background-color: rgba(0, 0, 0, 0.5); color: #ffffff;
             font-size: 15px; outline: none; transition: all 0.3s ease; font-family: 'Inter', sans-serif;
         }
         
-        input:focus, select:focus, textarea:focus { 
+        input:focus { 
             border-color: var(--neon-cyan); box-shadow: 0 0 10px rgba(0, 243, 255, 0.2); 
         }
-
-        textarea { resize: none; }
 
         button {
             width: 100%; padding: 16px; margin-top: 15px;
@@ -68,7 +65,6 @@
         }
         
         button:active { transform: scale(0.98); }
-        .btn-outline { background: transparent; border: 1px solid var(--neon-purple); color: var(--neon-purple); }
 
         .error-message { color: var(--error-red); font-size: 12px; display: none; margin-top: 6px; }
 
@@ -81,14 +77,12 @@
         
         .dashboard-card {
             background-color: rgba(0, 0, 0, 0.3); padding: 20px; border-radius: 12px; 
-            text-align: center; border: 1px solid rgba(255, 255, 255, 0.05); cursor: pointer;
+            text-align: center; border: 1px solid rgba(255, 255, 255, 0.05);
         }
-        .dashboard-card:hover { border-color: rgba(176, 38, 255, 0.5); background-color: rgba(176, 38, 255, 0.05); }
-        .dashboard-card h3 { margin: 0; font-size: 18px; font-family: 'Rajdhani', sans-serif; }
+        .dashboard-card h3 { margin: 0; font-size: 18px; font-family: 'Rajdhani', sans-serif; color: #ffffff; }
         .dashboard-card p { margin: 8px 0 0; font-size: 13px; color: var(--neon-cyan); font-weight: bold; }
 
-        /* Bölüm Görünürlükleri */
-        #dashboard-section, #support-section { display: none; }
+        #dashboard-section { display: none; }
     </style>
 </head>
 <body>
@@ -114,54 +108,22 @@
         <div class="dashboard-header">
             <h2>ySaHUB Paneli</h2>
         </div>
+        <p>Sistem aktif. Veri akışı sağlanıyor.</p>
         <div class="dashboard-grid">
             <div class="dashboard-card"><h3>Bakiye</h3><p>0.00 TL</p></div>
             <div class="dashboard-card"><h3>Seviye</h3><p>1. Seviye</p></div>
             <div class="dashboard-card"><h3>Görevler</h3><p>Veri Bekleniyor</p></div>
-            <div class="dashboard-card" onclick="openSupport()"><h3>Destek</h3><p>Talep Oluştur</p></div>
+            <div class="dashboard-card"><h3>Profil</h3><p>Ayarlar</p></div>
         </div>
-    </div>
-
-    <div class="container" id="support-section">
-        <div class="dashboard-header">
-            <h2>Destek Merkezi</h2>
-        </div>
-        
-        <div id="support-form-area">
-            <div class="form-group">
-                <label>Sorun Kategorisi</label>
-                <select id="support-type">
-                    <option value="Teknik">Teknik Altyapı</option>
-                    <option value="Finansal">Finansal İşlemler</option>
-                    <option value="Hesap">Hesap Yönetimi</option>
-                    <option value="Diger">Diğer</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Mesajınız (Maks. 200 Karakter)</label>
-                <textarea id="support-msg" rows="4" maxlength="200" placeholder="Sorununuzu detaylandırın..."></textarea>
-                <div id="char-count" style="text-align: right; font-size: 11px; color: var(--text-muted); margin-top: 5px;">0 / 200</div>
-            </div>
-            <button onclick="submitSupport()">Talebi Gönder</button>
-        </div>
-
-        <div id="support-locked-msg" style="display: none; text-align: center; color: var(--neon-cyan); margin: 30px 0;">
-            ⏳ Destek ekibine iletilen açık bir talebiniz var. Yeni bir mesaj göndermek için yanıt bekleniyor...
-        </div>
-
-        <button class="btn-outline" onclick="backToDashboard()">Geri Dön</button>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp;
         tg.expand(); tg.setHeaderColor('#0a0a10'); tg.setBackgroundColor('#0a0a10');
 
-        let currentTurn = 'user';
-
         window.onload = function() {
             const urlParams = new URLSearchParams(window.location.search);
             const isRegistered = urlParams.get('reg');
-            currentTurn = urlParams.get('turn') || 'user';
 
             if (isRegistered === '1') {
                 document.getElementById('register-section').style.display = 'none';
@@ -169,43 +131,12 @@
             }
         };
 
-        // Karakter Sayacı
-        document.getElementById('support-msg').addEventListener('input', function() {
-            document.getElementById('char-count').innerText = this.value.length + ' / 200';
-        });
-
-        // Sayfa Geçişleri
-        function openSupport() {
-            document.getElementById('dashboard-section').style.display = 'none';
-            document.getElementById('support-section').style.display = 'block';
-            
-            // Eğer sıra yöneticideyse formu gizle, uyarıyı göster
-            if (currentTurn === 'admin') {
-                document.getElementById('support-form-area').style.display = 'none';
-                document.getElementById('support-locked-msg').style.display = 'block';
-            }
-        }
-
-        function backToDashboard() {
-            document.getElementById('support-section').style.display = 'none';
-            document.getElementById('dashboard-section').style.display = 'block';
-        }
-
         function submitRegister() {
             const fullname = document.getElementById('fullname').value.trim();
             const phone = document.getElementById('phone').value.trim();
             const email = document.getElementById('email').value.trim();
             if(fullname && phone && email) {
                 tg.sendData(JSON.stringify({ action: "register", fullname: fullname, phone: phone, email: email }));
-            }
-        }
-
-        function submitSupport() {
-            const type = document.getElementById('support-type').value;
-            const message = document.getElementById('support-msg').value.trim();
-            
-            if(message.length > 0) {
-                tg.sendData(JSON.stringify({ action: "support", type: type, message: message }));
             }
         }
     </script>
