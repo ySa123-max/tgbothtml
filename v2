@@ -1,0 +1,2188 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Karınca Altfamilya Tespiti</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Space+Mono:wght@400;700&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg-deepest: #080b07;
+    --bg-deep: #0d1209;
+    --bg-card: #111a0d;
+    --bg-card2: #162010;
+    --border: #2a3d1c;
+    --border-glow: #4a7a28;
+    --amber: #d4821a;
+    --amber-light: #f0a830;
+    --amber-pale: #f5c860;
+    --green-dim: #2d5016;
+    --green-mid: #3d6b1e;
+    --green-bright: #5a9e2a;
+    --green-glow: #7ac43a;
+    --text-primary: #e8ddc8;
+    --text-secondary: #a89878;
+    --text-muted: #5c6648;
+    --text-accent: #d4821a;
+    --red-dim: #6b1515;
+    --red-bright: #c43a3a;
+    --shadow-green: 0 0 20px rgba(90,158,42,0.15);
+    --shadow-amber: 0 0 20px rgba(212,130,26,0.2);
+    --radius: 12px;
+    --radius-sm: 8px;
+    --transition: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    height: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--bg-deepest);
+    color: var(--text-primary);
+    font-family: 'Crimson Pro', serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  /* === BACKGROUND EFFECTS === */
+  .bg-noise {
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.6;
+  }
+
+  .bg-radial {
+    position: fixed;
+    top: -30%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 130%;
+    height: 70vh;
+    background: radial-gradient(ellipse at center, rgba(58,108,20,0.12) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .bg-radial-bottom {
+    position: fixed;
+    bottom: -20%;
+    right: -10%;
+    width: 60%;
+    height: 50vh;
+    background: radial-gradient(ellipse at center, rgba(180,100,10,0.06) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* === GRID LINES === */
+  .bg-grid {
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(58,108,20,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(58,108,20,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* === MAIN WRAPPER === */
+  #app {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 0 60px 0;
+    max-width: 620px;
+    margin: 0 auto;
+  }
+
+  /* === HEADER === */
+  .app-header {
+    width: 100%;
+    padding: 28px 20px 20px;
+    text-align: center;
+    position: relative;
+  }
+
+  .header-eyebrow {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 4px;
+    color: var(--green-bright);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    opacity: 0.8;
+  }
+
+  .header-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(22px, 6vw, 32px);
+    font-weight: 900;
+    color: var(--text-primary);
+    line-height: 1.15;
+    letter-spacing: -0.5px;
+  }
+
+  .header-title span {
+    color: var(--amber);
+    font-style: italic;
+  }
+
+  .header-subtitle {
+    font-family: 'Crimson Pro', serif;
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-top: 8px;
+    font-style: italic;
+  }
+
+  .header-divider {
+    margin: 18px auto 0;
+    width: 60px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--amber), transparent);
+  }
+
+  /* === ANT SVG LOGO === */
+  .ant-logo-wrapper {
+    margin: 0 auto 6px;
+    width: 56px;
+    height: 56px;
+    position: relative;
+  }
+
+  .ant-logo-glow {
+    position: absolute;
+    inset: -8px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(212,130,26,0.2) 0%, transparent 70%);
+    animation: pulse-glow 3s ease-in-out infinite;
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.1); }
+  }
+
+  /* === PROGRESS BAR === */
+  .progress-container {
+    width: 100%;
+    padding: 0 20px;
+    margin-bottom: 8px;
+  }
+
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+
+  .progress-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .progress-count {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--amber);
+  }
+
+  .progress-track {
+    width: 100%;
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: visible;
+    position: relative;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--green-mid), var(--amber));
+    border-radius: 2px;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+  }
+
+  .progress-fill::after {
+    content: '';
+    position: absolute;
+    right: -3px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--amber-light);
+    box-shadow: 0 0 8px var(--amber);
+  }
+
+  /* === BREADCRUMB === */
+  .breadcrumb {
+    width: 100%;
+    padding: 6px 20px;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    align-items: center;
+    min-height: 32px;
+  }
+
+  .crumb-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+  }
+
+  .crumb-item.active {
+    color: var(--green-bright);
+  }
+
+  .crumb-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--text-muted);
+    flex-shrink: 0;
+  }
+
+  .crumb-dot.active {
+    background: var(--amber);
+    box-shadow: 0 0 6px var(--amber);
+  }
+
+  .crumb-arrow {
+    color: var(--border);
+    font-size: 10px;
+    margin-left: 2px;
+  }
+
+  /* === QUESTION CARD === */
+  .question-area {
+    width: 100%;
+    padding: 0 16px;
+    perspective: 1000px;
+  }
+
+  .question-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 20px 20px;
+    position: relative;
+    overflow: hidden;
+    animation: slideInCard 0.45s cubic-bezier(0.4, 0, 0.2, 1) both;
+  }
+
+  @keyframes slideInCard {
+    from {
+      opacity: 0;
+      transform: translateY(16px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .question-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--green-bright), var(--amber), transparent);
+    opacity: 0.6;
+  }
+
+  .question-card::after {
+    content: '';
+    position: absolute;
+    top: -40%;
+    right: -20%;
+    width: 60%;
+    height: 180%;
+    background: radial-gradient(ellipse, rgba(58,108,20,0.06) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .q-number {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--amber);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .q-number::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--border), transparent);
+  }
+
+  .q-icon-area {
+    display: flex;
+    justify-content: center;
+    margin: 12px 0 20px;
+  }
+
+  .q-icon-box {
+    width: 88px;
+    height: 88px;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at 30% 30%, rgba(90,158,42,0.1), transparent 70%);
+    position: relative;
+    animation: rotateGlow 8s linear infinite;
+  }
+
+  @keyframes rotateGlow {
+    from { box-shadow: 0 0 15px rgba(90,158,42,0.1), inset 0 0 15px rgba(90,158,42,0.05); }
+    50% { box-shadow: 0 0 25px rgba(212,130,26,0.15), inset 0 0 20px rgba(212,130,26,0.07); }
+    to { box-shadow: 0 0 15px rgba(90,158,42,0.1), inset 0 0 15px rgba(90,158,42,0.05); }
+  }
+
+  .q-text {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(17px, 4.5vw, 21px);
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.4;
+    margin-bottom: 6px;
+    text-align: center;
+  }
+
+  .q-hint {
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-style: italic;
+    text-align: center;
+    line-height: 1.5;
+    margin-bottom: 22px;
+    padding: 0 4px;
+  }
+
+  /* === INFO BOX === */
+  .q-info-box {
+    background: rgba(58,108,20,0.08);
+    border: 1px solid rgba(58,108,20,0.2);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    margin-bottom: 20px;
+    font-size: 12.5px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    position: relative;
+    font-style: italic;
+  }
+
+  .q-info-box::before {
+    content: '🔬';
+    display: block;
+    font-style: normal;
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+
+  /* === ANATOMY SVG ILLUSTRATIONS === */
+  .anatomy-svg {
+    display: block;
+    margin: 0 auto;
+    filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));
+  }
+
+  /* === CHOICE BUTTONS === */
+  .choices-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .choice-btn {
+    width: 100%;
+    background: var(--bg-card2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 14px 18px;
+    cursor: pointer;
+    text-align: left;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    animation: fadeInBtn 0.4s ease both;
+  }
+
+  .choice-btn:nth-child(1) { animation-delay: 0.1s; }
+  .choice-btn:nth-child(2) { animation-delay: 0.18s; }
+  .choice-btn:nth-child(3) { animation-delay: 0.26s; }
+
+  @keyframes fadeInBtn {
+    from { opacity: 0; transform: translateX(-12px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  .choice-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(90,158,42,0.08) 0%, transparent 60%);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .choice-btn:hover::before,
+  .choice-btn:active::before {
+    opacity: 1;
+  }
+
+  .choice-btn:hover,
+  .choice-btn:active {
+    border-color: var(--green-bright);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px rgba(90,158,42,0.12);
+  }
+
+  .choice-btn.yes-btn:hover,
+  .choice-btn.yes-btn:active {
+    border-color: var(--green-bright);
+    box-shadow: 0 4px 20px rgba(90,158,42,0.2);
+  }
+
+  .choice-btn.no-btn:hover,
+  .choice-btn.no-btn:active {
+    border-color: var(--amber);
+    box-shadow: 0 4px 20px rgba(212,130,26,0.15);
+  }
+
+  .choice-indicator {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 16px;
+    transition: var(--transition);
+  }
+
+  .yes-btn .choice-indicator {
+    background: rgba(90,158,42,0.15);
+    border: 1px solid rgba(90,158,42,0.3);
+    color: var(--green-bright);
+  }
+
+  .no-btn .choice-indicator {
+    background: rgba(212,130,26,0.12);
+    border: 1px solid rgba(212,130,26,0.25);
+    color: var(--amber);
+  }
+
+  .choice-content {
+    flex: 1;
+  }
+
+  .choice-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+    transition: color 0.3s;
+  }
+
+  .yes-btn .choice-label { color: var(--green-bright); }
+  .no-btn .choice-label { color: var(--amber); }
+
+  .choice-desc {
+    font-size: 13.5px;
+    color: var(--text-secondary);
+    line-height: 1.45;
+  }
+
+  .choice-arrow {
+    color: var(--text-muted);
+    font-size: 14px;
+    transition: transform 0.3s, color 0.3s;
+  }
+
+  .choice-btn:hover .choice-arrow {
+    transform: translateX(4px);
+    color: var(--green-bright);
+  }
+
+  /* === BACK BUTTON === */
+  .back-area {
+    width: 100%;
+    padding: 12px 16px 4px;
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  .back-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 7px 16px;
+    color: var(--text-muted);
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    touch-action: manipulation;
+  }
+
+  .back-btn:hover {
+    border-color: var(--border-glow);
+    color: var(--text-secondary);
+    background: rgba(58,108,20,0.07);
+  }
+
+  .back-btn:disabled {
+    opacity: 0.3;
+    pointer-events: none;
+  }
+
+  /* === RESTART BTN === */
+  .restart-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 7px 16px;
+    color: var(--text-muted);
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    touch-action: manipulation;
+  }
+
+  .restart-btn:hover {
+    border-color: var(--amber);
+    color: var(--amber);
+    background: rgba(212,130,26,0.07);
+  }
+
+  /* === RESULT SCREEN === */
+  .result-screen {
+    width: 100%;
+    padding: 0 16px;
+    animation: resultReveal 0.6s cubic-bezier(0.4, 0, 0.2, 1) both;
+  }
+
+  @keyframes resultReveal {
+    from {
+      opacity: 0;
+      transform: translateY(24px) scale(0.96);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  .result-badge {
+    text-align: center;
+    margin-bottom: 4px;
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 4px;
+    color: var(--green-bright);
+    text-transform: uppercase;
+    animation: fadeInUp 0.5s 0.1s both;
+  }
+
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .result-hero {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 28px 20px 24px;
+    margin-bottom: 14px;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+    animation: fadeInUp 0.5s 0.15s both;
+  }
+
+  .result-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--green-dim), var(--green-bright), var(--amber-light), var(--green-bright), var(--green-dim));
+    background-size: 200% 100%;
+    animation: shimmerBorder 3s linear infinite;
+  }
+
+  @keyframes shimmerBorder {
+    from { background-position: 200% 0; }
+    to { background-position: -200% 0; }
+  }
+
+  .result-hero::after {
+    content: '';
+    position: absolute;
+    bottom: -30%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 60%;
+    background: radial-gradient(ellipse, rgba(90,158,42,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .result-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 18px;
+    position: relative;
+  }
+
+  .result-icon-ring {
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 1px solid var(--green-bright);
+    opacity: 0.4;
+    animation: ringPulse 2.5s ease-in-out infinite;
+  }
+
+  .result-icon-ring-outer {
+    position: absolute;
+    inset: -14px;
+    border-radius: 50%;
+    border: 1px solid var(--amber);
+    opacity: 0.2;
+    animation: ringPulse 2.5s ease-in-out infinite 0.5s;
+  }
+
+  @keyframes ringPulse {
+    0%, 100% { transform: scale(1); opacity: 0.2; }
+    50% { transform: scale(1.05); opacity: 0.5; }
+  }
+
+  .result-name {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(26px, 7vw, 34px);
+    font-weight: 900;
+    font-style: italic;
+    color: var(--amber-light);
+    margin-bottom: 4px;
+    letter-spacing: -0.5px;
+    text-shadow: 0 0 30px rgba(212,130,26,0.3);
+  }
+
+  .result-subtitle {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .result-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 16px;
+  }
+
+  .tag {
+    background: rgba(58,108,20,0.15);
+    border: 1px solid rgba(58,108,20,0.3);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: var(--green-bright);
+    text-transform: uppercase;
+  }
+
+  .tag.amber {
+    background: rgba(212,130,26,0.12);
+    border-color: rgba(212,130,26,0.25);
+    color: var(--amber-light);
+  }
+
+  .tag.red {
+    background: rgba(180,40,40,0.12);
+    border-color: rgba(180,40,40,0.25);
+    color: #e07070;
+  }
+
+  .result-desc {
+    font-size: 15px;
+    color: var(--text-secondary);
+    line-height: 1.65;
+    font-style: italic;
+    border-top: 1px solid var(--border);
+    padding-top: 14px;
+  }
+
+  /* === FEATURES GRID === */
+  .features-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 18px;
+    margin-bottom: 14px;
+    animation: fadeInUp 0.5s 0.25s both;
+  }
+
+  .features-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .features-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .features-list {
+    display: grid;
+    gap: 10px;
+  }
+
+  .feature-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .feature-key {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    color: var(--amber);
+    min-width: 88px;
+    flex-shrink: 0;
+    padding-top: 2px;
+    letter-spacing: 0.5px;
+  }
+
+  .feature-val {
+    font-size: 13.5px;
+    color: var(--text-primary);
+    line-height: 1.45;
+  }
+
+  .feature-val .yes { color: var(--green-bright); font-weight: 600; }
+  .feature-val .no { color: #e07070; }
+  .feature-val .maybe { color: var(--amber-light); }
+  .feature-val .special { color: var(--amber-pale); font-style: italic; }
+
+  /* === GENUS LIST === */
+  .genus-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 18px;
+    margin-bottom: 14px;
+    animation: fadeInUp 0.5s 0.35s both;
+  }
+
+  .genus-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .genus-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .genus-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 8px;
+  }
+
+  .genus-chip {
+    background: var(--bg-card2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-family: 'Crimson Pro', serif;
+    font-size: 14px;
+    font-style: italic;
+    color: var(--text-primary);
+    transition: all 0.25s;
+    position: relative;
+    overflow: hidden;
+    animation: chipIn 0.35s ease both;
+  }
+
+  @keyframes chipIn {
+    from { opacity: 0; transform: scale(0.92); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .genus-chip::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+    background: linear-gradient(180deg, var(--green-bright), var(--amber));
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .genus-chip:hover::before { opacity: 1; }
+  .genus-chip:hover {
+    border-color: var(--border-glow);
+    background: rgba(58,108,20,0.1);
+    transform: translateX(2px);
+  }
+
+  /* === UNCERTAINTY CARD === */
+  .note-card {
+    background: rgba(212,130,26,0.07);
+    border: 1px solid rgba(212,130,26,0.2);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 14px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    animation: fadeInUp 0.5s 0.45s both;
+  }
+
+  .note-card-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--amber);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  /* === RESULT ACTIONS === */
+  .result-actions {
+    display: flex;
+    gap: 10px;
+    animation: fadeInUp 0.5s 0.55s both;
+    padding-bottom: 20px;
+  }
+
+  .action-btn {
+    flex: 1;
+    padding: 13px 16px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    transition: var(--transition);
+    touch-action: manipulation;
+    text-align: center;
+  }
+
+  .action-btn.primary {
+    background: linear-gradient(135deg, var(--green-dim), rgba(90,158,42,0.2));
+    border-color: var(--green-mid);
+    color: var(--green-bright);
+  }
+
+  .action-btn.primary:hover {
+    background: linear-gradient(135deg, rgba(58,108,20,0.5), rgba(90,158,42,0.3));
+    border-color: var(--green-bright);
+    box-shadow: 0 4px 20px rgba(90,158,42,0.2);
+    transform: translateY(-1px);
+  }
+
+  .action-btn.secondary {
+    background: transparent;
+    border-color: var(--border);
+    color: var(--text-muted);
+  }
+
+  .action-btn.secondary:hover {
+    border-color: var(--amber);
+    color: var(--amber);
+    background: rgba(212,130,26,0.07);
+  }
+
+  /* === INTRO SCREEN === */
+  .intro-screen {
+    width: 100%;
+    padding: 0 16px;
+  }
+
+  .intro-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px 20px;
+    margin-bottom: 14px;
+    position: relative;
+    overflow: hidden;
+    animation: slideInCard 0.5s ease both;
+  }
+
+  .intro-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--amber), transparent);
+  }
+
+  .intro-section-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--amber);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .intro-section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .term-row {
+    display: flex;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(42,61,28,0.5);
+  }
+
+  .term-row:last-child { border-bottom: none; }
+
+  .term-icon {
+    width: 36px;
+    height: 36px;
+    background: rgba(58,108,20,0.12);
+    border: 1px solid rgba(58,108,20,0.25);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+
+  .term-content {}
+
+  .term-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--amber-light);
+    margin-bottom: 3px;
+  }
+
+  .term-def {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  .start-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--green-dim), rgba(90,158,42,0.25));
+    border: 1px solid var(--green-mid);
+    border-radius: var(--radius-sm);
+    color: var(--green-glow);
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: var(--transition);
+    margin-bottom: 14px;
+    touch-action: manipulation;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .start-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, transparent 30%, rgba(122,196,58,0.1) 100%);
+    transform: translateX(-100%);
+    transition: transform 0.5s ease;
+  }
+
+  .start-btn:hover::after { transform: translateX(0); }
+
+  .start-btn:hover {
+    background: linear-gradient(135deg, rgba(58,108,20,0.5), rgba(90,158,42,0.35));
+    border-color: var(--green-bright);
+    box-shadow: 0 4px 24px rgba(90,158,42,0.2), 0 0 0 1px rgba(90,158,42,0.1);
+    transform: translateY(-1px);
+  }
+
+  /* === STAT CHIPS ROW === */
+  .stat-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .stat-chip {
+    flex: 1;
+    min-width: 80px;
+    background: var(--bg-card2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 10px;
+    text-align: center;
+  }
+
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 900;
+    color: var(--amber);
+    line-height: 1;
+    margin-bottom: 3px;
+  }
+
+  .stat-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+
+  /* === RARITY INDICATOR === */
+  .rarity-bar {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+
+  .rarity-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-right: 6px;
+  }
+
+  .rarity-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    background: var(--border);
+    transition: all 0.3s;
+  }
+
+  .rarity-dot.filled {
+    background: var(--green-bright);
+    box-shadow: 0 0 6px rgba(90,158,42,0.4);
+  }
+
+  .rarity-dot.filled.amber {
+    background: var(--amber);
+    box-shadow: 0 0 6px rgba(212,130,26,0.4);
+  }
+
+  .rarity-dot.filled.rare {
+    background: #7b68ee;
+    box-shadow: 0 0 6px rgba(123,104,238,0.4);
+  }
+
+  .rarity-text {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-left: 8px;
+    font-style: italic;
+  }
+
+  /* === ANSWER HISTORY PANEL === */
+  .history-panel {
+    width: 100%;
+    padding: 8px 16px 0;
+  }
+
+  .history-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .history-item {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    opacity: 0.7;
+  }
+
+  .history-q {
+    font-size: 12px;
+    color: var(--text-muted);
+    flex: 1;
+    line-height: 1.3;
+  }
+
+  .history-a {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    flex-shrink: 0;
+  }
+
+  .history-a.yes {
+    background: rgba(90,158,42,0.15);
+    color: var(--green-bright);
+  }
+
+  .history-a.no {
+    background: rgba(212,130,26,0.12);
+    color: var(--amber);
+  }
+
+  /* === FOOTER NOTE === */
+  .footer-note {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-muted);
+    font-style: italic;
+    padding: 0 20px;
+    margin-top: 8px;
+    animation: fadeInUp 0.5s 0.6s both;
+  }
+
+  /* === TRANSITIONS === */
+  .fade-out {
+    animation: fadeOutDown 0.3s ease forwards !important;
+  }
+
+  @keyframes fadeOutDown {
+    from { opacity: 1; transform: translateY(0) scale(1); }
+    to { opacity: 0; transform: translateY(-12px) scale(0.98); }
+  }
+
+  /* === SCROLLBAR === */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--bg-deepest); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--border-glow); }
+
+  /* === RESPONSIVE === */
+  @media (max-width: 380px) {
+    .genus-grid { grid-template-columns: repeat(2, 1fr); }
+    .result-actions { flex-direction: column; }
+    .stat-row { gap: 6px; }
+    .stat-chip { padding: 8px 6px; }
+    .stat-num { font-size: 18px; }
+  }
+
+  /* === SELECTION HIGHLIGHT === */
+  .choice-btn.selected {
+    border-color: var(--green-bright);
+    background: rgba(90,158,42,0.1);
+    transform: scale(0.98);
+    pointer-events: none;
+  }
+
+  .choice-btn.selected.no-selected {
+    border-color: var(--amber);
+    background: rgba(212,130,26,0.1);
+  }
+
+  /* === LOADING DOTS === */
+  .loading-dots {
+    display: inline-flex;
+    gap: 4px;
+    align-items: center;
+    vertical-align: middle;
+  }
+
+  .loading-dots span {
+    width: 5px;
+    height: 5px;
+    background: var(--green-bright);
+    border-radius: 50%;
+    animation: dotBounce 1.2s ease-in-out infinite;
+  }
+
+  .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes dotBounce {
+    0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+    40% { transform: scale(1); opacity: 1; }
+  }
+</style>
+</head>
+
+<body>
+<div class="bg-noise"></div>
+<div class="bg-radial"></div>
+<div class="bg-radial-bottom"></div>
+<div class="bg-grid"></div>
+
+<div id="app">
+  <!-- Header -->
+  <div class="app-header">
+    <div class="ant-logo-wrapper">
+      <div class="ant-logo-glow"></div>
+      <svg class="anatomy-svg" width="56" height="56" viewBox="0 0 56 56">
+        <!-- Ant body SVG -->
+        <ellipse cx="28" cy="10" rx="7" ry="7" fill="#1a2e0d" stroke="#5a9e2a" stroke-width="1.2"/>
+        <!-- Eyes -->
+        <circle cx="25" cy="9" r="1.5" fill="#d4821a"/>
+        <circle cx="31" cy="9" r="1.5" fill="#d4821a"/>
+        <!-- Antennae -->
+        <path d="M25 5 Q20 -1 16 2" stroke="#5a9e2a" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+        <path d="M31 5 Q36 -1 40 2" stroke="#5a9e2a" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+        <circle cx="16" cy="2" r="1.8" fill="#d4821a"/>
+        <circle cx="40" cy="2" r="1.8" fill="#d4821a"/>
+        <!-- Thorax -->
+        <path d="M22 16 Q21 22 22 28" stroke="#2a3d1c" stroke-width="0.5" fill="none"/>
+        <path d="M34 16 Q35 22 34 28" stroke="#2a3d1c" stroke-width="0.5" fill="none"/>
+        <ellipse cx="28" cy="22" rx="8" ry="7" fill="#162010" stroke="#5a9e2a" stroke-width="1.2"/>
+        <!-- Legs -->
+        <path d="M21 19 Q13 17 10 22" stroke="#4a7a28" stroke-width="1" fill="none" stroke-linecap="round"/>
+        <path d="M21 22 Q12 22 9 28" stroke="#4a7a28" stroke-width="1" fill="none" stroke-linecap="round"/>
+        <path d="M21 26 Q13 28 11 34" stroke="#4a7a28" stroke-width="1" fill="none" stroke-linecap="round"/>
+        <path d="M35 19 Q43 17 46 22" stroke="#4a7a28" stroke-width="1" fill="none" stroke-linecap="round"/>
+        <path d="M35 22 Q44 22 47 28" stroke="#4a7a28" stroke-width="1" fill="none" stroke-linecap="round"/>
+        <path d="M35 26 Q43 28 45 34" stroke="#4a7a28" stroke-width="1" fill="none" stroke-linecap="round"/>
+        <!-- Petiole -->
+        <rect x="25.5" y="29" width="5" height="5" rx="1.5" fill="#111a0d" stroke="#d4821a" stroke-width="1"/>
+        <!-- Abdomen -->
+        <ellipse cx="28" cy="45" rx="10" ry="9" fill="#162010" stroke="#5a9e2a" stroke-width="1.2"/>
+        <!-- Abdomen segments -->
+        <path d="M18.5 44 Q28 41 37.5 44" stroke="#2a3d1c" stroke-width="0.8" fill="none"/>
+        <path d="M18.5 47 Q28 45 37.5 47" stroke="#2a3d1c" stroke-width="0.8" fill="none"/>
+      </svg>
+    </div>
+    <div class="header-eyebrow">Formicidae · Türkiye</div>
+    <h1 class="header-title">Karınca <span>Altfamilya</span><br>Tespit Rehberi</h1>
+    <p class="header-subtitle">Sıralı sorularla altfamilyanı keşfet</p>
+    <div class="header-divider"></div>
+  </div>
+
+  <!-- Dynamic content area -->
+  <div id="content-area" style="width:100%"></div>
+</div>
+
+<script>
+// ============================================================
+//  DATA — Tüm altfamilya verileri (sadece kaynaktan)
+// ============================================================
+
+const SUBFAMILIES = {
+  formicinae: {
+    name: "Formicinae",
+    icon: "🟡",
+    color: "#d4821a",
+    colorDim: "rgba(212,130,26,0.15)",
+    rarity: 5,
+    rarityType: "green",
+    rarityText: "Çok yaygın",
+    description: "Türkiye'nin en yaygın altfamilyalarından biridir. Abdomenin sonundaki asit poru (acidopore) bu altfamilyaya özgü benzersiz bir tanı karakteridir.",
+    tags: ["Tek Petiole", "Asit Poru", "İğnesiz", "Topuzsuz Anten"],
+    features: {
+      "Petiole": '<span class="yes">Tek petiole</span> — Belirgin, oval/üçgen/dikdörtgen/kare/beşgen şekillerde olabilir.',
+      "Postpetiole": '<span class="no">Yok</span>',
+      "Asit Poru": '<span class="yes">VAR</span> — Abdomen sonunda ters huni şeklinde kıllarla çevrili. <span class="special">Sadece bu altfamilyada!</span>',
+      "Koza": '<span class="maybe">Çoğunlukla örer</span> — Nylanderia ve Colobopsis gibi bazı cinsler örmez.',
+      "İğne": '<span class="no">Yok</span>',
+      "Diken (Spine)": '<span class="maybe">Bazı türlerde var</span> — Örn. Lepisiota fraunfeldi.',
+      "Anten Topuzu": '<span class="no">Topuzsuz</span>',
+    },
+    genera: ["Camponotus","Cataglyphis","Colobopsis","Formica","Lasius","Lepisiota","Nylanderia","Paratrechina","Plagiolepis","Polyergus","Prenolepis","Proformica","Rossomyrmex"],
+    note: "Asit poru görülüyorsa kesinlikle Formicinae'dir. Diğer hiçbir altfamilyada asit poru bulunmaz.",
+  },
+  dolichoderinae: {
+    name: "Dolichoderinae",
+    icon: "🔵",
+    color: "#3a8fb5",
+    colorDim: "rgba(58,143,181,0.15)",
+    rarity: 3,
+    rarityType: "amber",
+    rarityText: "Orta yaygınlıkta",
+    description: "Tapinoma cinsi dışında Türkiye'de yaygın üyesi bulunmayan bir altfamilyadır. Petiolelerinin abdomen tarafından örtülmesi en belirgin özelliğidir.",
+    tags: ["Tek Petiole", "Gizli Petiole", "Koza Yok", "İğne Yok"],
+    features: {
+      "Petiole": '<span class="yes">Tek petiole</span> — Genellikle <span class="special">gizli</span>; abdomenin ilk tergiti tarafından örtülür. (Dolichoderus gibi istisna cinsler hariç)',
+      "Postpetiole": '<span class="no">Yok</span>',
+      "Asit Poru": '<span class="no">Yok</span>',
+      "Koza": '<span class="no">Öremez</span>',
+      "İğne": '<span class="no">Yok</span>',
+      "Diken (Spine)": '<span class="no">Yok</span>',
+      "Abdomen Sonu": '<span class="special">Genelde yarık/çentik var</span>',
+      "Anten Topuzu": '<span class="maybe">Belirsiz / Değişken</span>',
+    },
+    genera: ["Bothriomyrmex","Dolichoderus","Linepithema","Liometopum","Tapinoma"],
+    note: "Türkiye'de en çok Tapinoma cinsi ile karşılaşılır. Gizli petiole ile Formicinae'den, postpetiole yokluğuyla Myrmicinae'den, cryptic olmamasıyla Ponerinae'den ayrılır.",
+  },
+  myrmicinae: {
+    name: "Myrmicinae",
+    icon: "🔴",
+    color: "#c43a3a",
+    colorDim: "rgba(196,58,58,0.15)",
+    rarity: 5,
+    rarityType: "green",
+    rarityText: "En yaygın / En kalabalık",
+    description: "Türkiye'nin en kalabalık altfamilyasıdır. Hem petiole hem de postpetiole varlığı ile diğer tüm altfamilyalardan kolayca ayırt edilir.",
+    tags: ["Petiole + Postpetiole", "Anten Topuzlu", "Koza Yok (pupa)", "Diken Olabilir"],
+    features: {
+      "Petiole": '<span class="yes">Var</span>',
+      "Postpetiole": '<span class="yes">VAR</span> — <span class="special">Bu altfamilyanın en belirgin özelliği!</span>',
+      "Asit Poru": '<span class="no">Yok</span>',
+      "Koza": '<span class="no">Pupaları kozasız</span>',
+      "İğne": '<span class="maybe">Bazı türlerde var</span>',
+      "Diken (Spine)": '<span class="maybe">Bazı türlerde var</span> — Dikeni olan bir karınca büyük olasılıkla Myrmicinae\'dir.',
+      "Anten Topuzu": '<span class="yes">Mevcut</span>',
+    },
+    genera: ["Aphaenogaster","Cardiocondyla","Carebara","Crematogaster","Formicoxenus","Harpagoxenus","Leptothorax","Manica","Messor","Monomorium","Myrmecina","Myrmica","Myrmoxenus","Oxyopomyrmex","Pheidole","Solenopsis","Stenamma","Strongylognathus","Strumigenys","Temnothorax","Tetramorium","Trichomyrmex"],
+    note: "22 cins ile Türkiye'nin en büyük altfamilyasıdır. Hem petiole hem postpetiole mevcut ise Myrmicinae olarak değerlendirilebilir.",
+  },
+  ponerinae: {
+    name: "Ponerinae",
+    icon: "🟤",
+    color: "#8b6a3e",
+    colorDim: "rgba(139,106,62,0.15)",
+    rarity: 2,
+    rarityType: "amber",
+    rarityText: "Az yaygın",
+    description: "Pek yaygın olmayan bir altfamilyadır. İnce uzun vücutları ve uzun kalın dikdörtgen petioleleri ile tanınırlar. Cryptic yaşam tarzına sahiptirler.",
+    tags: ["Tek Petiole", "Dikdörtgen Petiole", "Koza Örer", "İğneli", "Cryptic"],
+    features: {
+      "Petiole": '<span class="yes">Tek petiole</span> — <span class="special">Uzun ve kalın dikdörtgen şeklinde</span>. Diğer altfamilyalardan farklı.',
+      "Postpetiole": '<span class="no">Yok</span>',
+      "Asit Poru": '<span class="no">Yok</span>',
+      "Koza": '<span class="yes">Örer</span>',
+      "İğne": '<span class="yes">Var</span>',
+      "Diken (Spine)": '<span class="no">Yok</span>',
+      "Anten Topuzu": '<span class="yes">Var</span>',
+      "Yaşam Tarzı": '<span class="special">Cryptic — yer altında, ışıktan uzak</span>',
+      "Beden Yapısı": '<span class="special">İnce, uzun</span>',
+    },
+    genera: ["Cryptopone","Emeryopone","Hypoponera","Ponera"],
+    note: "Cryptic yaşam tarzları nedeniyle nadiren yüzeyde görülürler. Uzun dikdörtgen petiole ve ince uzun beden en belirgin ayırt edici özelliklerdir.",
+  },
+  dorylinae: {
+    name: "Dorylinae",
+    icon: "⚫",
+    color: "#6b6b6b",
+    colorDim: "rgba(107,107,107,0.15)",
+    rarity: 1,
+    rarityType: "rare",
+    rarityText: "Son derece nadir",
+    description: "Ordu karıncalarından oluşan tamamen göçebe yaşayan bir altfamilyadır. Cryptic yaşam tarzları ve göçebe yapıları nedeniyle Türkiye'de neredeyse hiç görülmezler.",
+    tags: ["Göçebe", "Cryptic", "Gözleri Genellikle Yok", "Kaynaşmış Thorax"],
+    features: {
+      "Petiole": '<span class="maybe">Cinse göre değişir</span> — Dorylus\'ta petiolesi var; Aenictus ve Parasyscia\'da postpetiole de var.',
+      "Postpetiole": '<span class="maybe">Cinse göre</span> — Aenictus ve Parasyscia\'da var.',
+      "Asit Poru": '<span class="no">Yok</span>',
+      "Koza": '<span class="no">Türkiye\'dekiler örmez</span>',
+      "İğne": '<span class="maybe">Aenictus\'ta görülmüş</span>',
+      "Diken (Spine)": '<span class="no">Yok</span>',
+      "Anten Topuzu": '<span class="maybe">Cinse göre</span> — Dorylus\'ta yok; Aenictus ve Parasyscia\'da var.',
+      "Thorax": '<span class="special">Tamamen kaynaşmış ve düz</span>',
+      "Gözler": '<span class="special">Genellikle yok</span>',
+      "Yaşam Tarzı": '<span class="special">Tam göçebe — esaret altında beslenemez</span>',
+    },
+    genera: ["Aenictus","Dorylus","Parasyscia"],
+    note: "Göçebe yaşadıkları için esaret altında beslenemezler. Görülme ihtimali son derece düşüktür; uçuş sırasında erkeklerle ya da nadir anlarda işçilerle karşılaşılabilir.",
+  },
+  amblyoponinae: {
+    name: "Amblyoponinae",
+    icon: "🟣",
+    color: "#7b68ee",
+    colorDim: "rgba(123,104,238,0.15)",
+    rarity: 1,
+    rarityType: "rare",
+    rarityText: "Çok nadir",
+    description: "Türkiye'deki tek temsilcisi Stigmatomma cinsidir. Kare kafası, uzun çenesi ve ince bedeni ile son derece özgün bir görünüme sahiptir.",
+    tags: ["Tek Petiole", "Gastere Kaynaşmış Petiole", "Stigmatomma", "Koza Örer"],
+    features: {
+      "Petiole": '<span class="yes">Tek petiole</span> — <span class="special">Gasterin ilk tergiti ile yarısına kadar kaynaşmış!</span>',
+      "Postpetiole": '<span class="no">Yok</span>',
+      "Asit Poru": '<span class="no">Yok</span>',
+      "Koza": '<span class="yes">Örer</span>',
+      "İğne": '<span class="yes">Var</span>',
+      "Diken (Spine)": '<span class="no">Yok</span>',
+      "Anten Topuzu": '<span class="yes">Var</span>',
+      "Görünüm": '<span class="special">Kare kafa, uzun çene, ince beden</span>',
+    },
+    genera: ["Stigmatomma"],
+    note: "Türkiye'de yalnızca Stigmatomma cinsi bulunur. Petiolenin gastere yarısına kadar kaynaşmış olması bu altfamilyaya özgü en belirgin morfolojik karakterdir.",
+  },
+  proceratiinae: {
+    name: "Proceratiinae",
+    icon: "🟠",
+    color: "#e8740a",
+    colorDim: "rgba(232,116,10,0.15)",
+    rarity: 1,
+    rarityType: "rare",
+    rarityText: "Çok nadir",
+    description: "Türkiye'deki tek temsilcisi Proceratium cinsidir. Parlak turuncu rengi ve abdomeninin 2. tergitinden itibaren başlayan belirgin eğimi ile kolayca tanınır.",
+    tags: ["Tek Petiole", "Turuncu Renk", "Abdomen Eğimi", "Proceratium"],
+    features: {
+      "Petiole": '<span class="yes">Tek petiole</span>',
+      "Postpetiole": '<span class="no">Yok</span>',
+      "Asit Poru": '<span class="no">Yok</span>',
+      "Koza": '<span class="yes">Örer</span>',
+      "İğne": '<span class="yes">Var</span>',
+      "Diken (Spine)": '<span class="no">Yok</span>',
+      "Anten Topuzu": '<span class="yes">Var</span>',
+      "Renk": '<span class="special">Parlak turuncu</span>',
+      "Abdomen": '<span class="special">2. tergitinden itibaren belirgin eğim</span>',
+    },
+    genera: ["Proceratium"],
+    note: "Türkiye'de yalnızca Proceratium cinsi bulunur. Parlak turuncu renk ve abdomendeki karakteristik eğim tanı için yeterlidir.",
+  },
+};
+
+// ============================================================
+//  QUESTION TREE
+// ============================================================
+
+const QUESTIONS = {
+  q1: {
+    id: "q1",
+    num: "Soru 01",
+    title: "Asit Poru (Acidopore) var mı?",
+    hint: "Abdomenin en ucuna bakın. Ters huni şeklinde bir dizi kıl ile çevrili küçük bir delik var mı?",
+    info: "Asit poru (acidopore), karıncanın karın ucunda bulunan ve formik asit salgılamaya yarayan özel bir delikdir. Ters huni biçiminde dizilmiş kıllarla korunur ve gözle görülebilir.",
+    iconSvg: drawAcidopore(),
+    shortQ: "Asit poru?",
+    yes: { next: "result_formicinae", answer: "Evet — Asit poru görüldü" },
+    no:  { next: "q2", answer: "Hayır — Asit poru yok" },
+  },
+  q2: {
+    id: "q2",
+    num: "Soru 02",
+    title: "Postpetiole var mı?",
+    hint: "Thorax ile abdomen arasında KAÇ bağlantı segmenti var? İki tane varsa ikincisi postpetioledir.",
+    info: "Petiole, thorax ile abdomeni birbirine bağlayan ilk eklem segmentidir. Postpetiole ise bu bağlantının hemen arkasında yer alan ikinci segmenttir. İkisi bir arada varsa karınca kesinlikle Myrmicinae'dir.",
+    iconSvg: drawPostpetiole(),
+    shortQ: "Postpetiole var mı?",
+    yes: { next: "result_myrmicinae", answer: "Evet — İki bağlantı segmenti var" },
+    no:  { next: "q3", answer: "Hayır — Tek segment" },
+  },
+  q3: {
+    id: "q3",
+    num: "Soru 03",
+    title: "Göçebe mi? (Thorax kaynaşmış/düz?)",
+    hint: "Thorax tamamen kaynaşmış ve düz görünüyor mu? İşçilerin gözleri var mı? Koloni tamamen göç halinde mi?",
+    info: "Dorylinae (ordu karıncaları) tamamen göçebe yaşar. Thoraxları diğer altfamilyalara kıyasla tamamen birbirine kaynaşmış ve düzdür. İşçilerinin büyük çoğunluğunun gözleri yoktur. Türkiye'de son derece nadirdirler.",
+    iconSvg: drawThorax(),
+    shortQ: "Göçebe / kaynaşmış thorax?",
+    yes: { next: "result_dorylinae", answer: "Evet — Göçebe, kaynaşmış thorax" },
+    no:  { next: "q4", answer: "Hayır — Göçebe değil" },
+  },
+  q4: {
+    id: "q4",
+    num: "Soru 04",
+    title: "Petiole abdomen tarafından gizli mi?",
+    hint: "Abdomenin ilk segmenti (tergit) petioleyi örtüyor mu? Sanki petiole yokmuş gibi görünüyor mu? Ayrıca abdomende bir çentik/yarık var mı?",
+    info: "Dolichoderinae'de abdomenin ilk tergiti petioleyi örter ve bu nedenle petiole sanki hiç yokmuş gibi görünür. Abdomende genellikle bir yarık veya çentik bulunur. Koza öremezler, iğne ve dikenleri yoktur.",
+    iconSvg: drawHiddenPetiole(),
+    shortQ: "Petiole gizli mi?",
+    yes: { next: "result_dolichoderinae", answer: "Evet — Petiole abdomen altında gizli" },
+    no:  { next: "q5", answer: "Hayır — Petiole görünür" },
+  },
+  q5: {
+    id: "q5",
+    num: "Soru 05",
+    title: "Parlak turuncu renk ve abdomen eğimi var mı?",
+    hint: "Karınca belirgin şekilde parlak turuncu mu? Abdomenin 2. tergitinden itibaren yukarı doğru belirgin bir eğim var mı?",
+    info: "Proceratiinae altfamilyasının Türkiye'deki tek temsilcisi Proceratium cinsidir. Parlak turuncu rengi ve abdomendeki karakteristik eğimi ile diğer tüm karıncalardan kolayca ayırt edilir.",
+    iconSvg: drawAbdomenCurve(),
+    shortQ: "Parlak turuncu + abdomen eğimi?",
+    yes: { next: "result_proceratiinae", answer: "Evet — Parlak turuncu, abdomen eğimli" },
+    no:  { next: "q6", answer: "Hayır — Turuncu değil, eğim yok" },
+  },
+  q6: {
+    id: "q6",
+    num: "Soru 06",
+    title: "Petiole gastere yarısına kadar kaynaşmış mı?",
+    hint: "Petiole, abdomenin (gasterin) ilk tergiti ile yarısına kadar birleşmiş/kaynaşmış durumda mı? Ayrıca kare kafa ve uzun çene var mı?",
+    info: "Amblyoponinae'nin Türkiye'deki tek temsilcisi Stigmatomma cinsidir. Petiolenin gasterin ilk tergiti ile yarısına kadar kaynaşmış olması, kare kafa ve uzun çene bu altfamilyaya özgüdür.",
+    iconSvg: drawFusedPetiole(),
+    shortQ: "Petiole gastere kaynaşmış mı?",
+    yes: { next: "result_amblyoponinae", answer: "Evet — Petiole gastere kaynaşmış" },
+    no:  { next: "result_ponerinae", answer: "Hayır — Kaynaşmamış" },
+  },
+};
+
+// ============================================================
+//  SVG ILLUSTRATION FUNCTIONS
+// ============================================================
+
+function drawAcidopore() {
+  return `<svg class="anatomy-svg" width="72" height="72" viewBox="0 0 72 72">
+    <!-- Abdomen -->
+    <ellipse cx="32" cy="36" rx="18" ry="14" fill="#162010" stroke="#5a9e2a" stroke-width="1.2"/>
+    <!-- Segments -->
+    <path d="M14.5 34 Q32 30 49.5 34" stroke="#2a3d1c" stroke-width="0.8" fill="none"/>
+    <path d="M14.5 39 Q32 36 49.5 39" stroke="#2a3d1c" stroke-width="0.8" fill="none"/>
+    <!-- Acidopore tip -->
+    <circle cx="50" cy="36" r="5" fill="#111a0d" stroke="#d4821a" stroke-width="1.5"/>
+    <circle cx="50" cy="36" r="2" fill="#d4821a" opacity="0.8"/>
+    <!-- Glow -->
+    <circle cx="50" cy="36" r="5" fill="none" stroke="#d4821a" stroke-width="1" opacity="0.4"/>
+    <!-- Hairs around acidopore -->
+    <path d="M50 29 L50 26" stroke="#d4821a" stroke-width="1" stroke-linecap="round"/>
+    <path d="M50 43 L50 46" stroke="#d4821a" stroke-width="1" stroke-linecap="round"/>
+    <path d="M43.5 36 L40.5 36" stroke="#d4821a" stroke-width="1" stroke-linecap="round"/>
+    <path d="M56.5 36 L59.5 36" stroke="#d4821a" stroke-width="1" stroke-linecap="round"/>
+    <path d="M45.5 30.5 L43 28" stroke="#d4821a" stroke-width="1" stroke-linecap="round"/>
+    <path d="M54.5 30.5 L57 28" stroke="#d4821a" stroke-width="1" stroke-linecap="round"/>
+    <path d="M45.5 41.5 L43 44" stroke="#d4821a" stroke-width="1" stroke-linecap="round"/>
+    <path d="M54.5 41.5 L57 44" stroke="#d4821a" stroke-width="1" stroke-linecap="round"/>
+    <!-- Label arrow -->
+    <path d="M58 20 Q62 28 55 34" stroke="#d4821a" stroke-width="0.8" fill="none" stroke-dasharray="2,2"/>
+    <text x="52" y="17" fill="#d4821a" font-size="7" font-family="monospace">acidopore</text>
+  </svg>`;
+}
+
+function drawPostpetiole() {
+  return `<svg class="anatomy-svg" width="72" height="72" viewBox="0 0 72 72">
+    <!-- Thorax -->
+    <ellipse cx="14" cy="36" rx="10" ry="8" fill="#162010" stroke="#5a9e2a" stroke-width="1.2"/>
+    <!-- Petiole -->
+    <rect x="24" y="32" width="8" height="8" rx="2" fill="#111a0d" stroke="#5a9e2a" stroke-width="1.2"/>
+    <text x="25" y="45" fill="#5a9e2a" font-size="5.5" font-family="monospace">petiole</text>
+    <!-- Postpetiole -->
+    <rect x="33" y="31" width="9" height="10" rx="2.5" fill="#111a0d" stroke="#d4821a" stroke-width="1.5"/>
+    <circle cx="37.5" cy="36" r="1.5" fill="#d4821a" opacity="0.7"/>
+    <text x="31" y="47" fill="#d4821a" font-size="5" font-family="monospace">postpetiole</text>
+    <!-- Abdomen -->
+    <ellipse cx="56" cy="36" rx="13" ry="11" fill="#162010" stroke="#5a9e2a" stroke-width="1.2"/>
+    <!-- Abdomen segments -->
+    <path d="M43 34 Q56 31 69 34" stroke="#2a3d1c" stroke-width="0.7" fill="none"/>
+    <path d="M43 38 Q56 36 69 38" stroke="#2a3d1c" stroke-width="0.7" fill="none"/>
+    <!-- Arrow highlight postpetiole -->
+    <path d="M37.5 24 L37.5 29" stroke="#d4821a" stroke-width="1" stroke-dasharray="2,1.5" stroke-linecap="round"/>
+    <circle cx="37.5" cy="22" r="3" fill="none" stroke="#d4821a" stroke-width="0.8"/>
+    <text x="40" y="23" fill="#d4821a" font-size="5" font-family="monospace">2.eklem!</text>
+  </svg>`;
+}
+
+function drawThorax() {
+  return `<svg class="anatomy-svg" width="72" height="72" viewBox="0 0 72 72">
+    <!-- Flat/fused thorax -->
+    <rect x="18" y="30" width="32" height="12" rx="4" fill="#162010" stroke="#5a9e2a" stroke-width="1.2"/>
+    <!-- Fusion lines gone (smooth) -->
+    <rect x="18" y="30" width="32" height="12" rx="4" fill="none" stroke="#3d6b1e" stroke-width="0.5" stroke-dasharray="3,2"/>
+    <!-- Head -->
+    <ellipse cx="10" cy="36" rx="7" ry="7" fill="#162010" stroke="#5a9e2a" stroke-width="1.2"/>
+    <!-- No eyes marker -->
+    <circle cx="8" cy="34" r="2" fill="#2a3d1c" stroke="#444"/>
+    <path d="M7 33 L9 35" stroke="#c43a3a" stroke-width="1" stroke-linecap="round"/>
+    <path d="M9 33 L7 35" stroke="#c43a3a" stroke-width="1" stroke-linecap="round"/>
+    <!-- Gaster -->
+    <ellipse cx="62" cy="36" rx="9" ry="10" fill="#162010" stroke="#5a9e2a" stroke-width="1.2"/>
+    <!-- Petiole small -->
+    <rect x="51" y="33" width="6" height="6" rx="1.5" fill="#111a0d" stroke="#5a9e2a" stroke-width="0.8"/>
+    <!-- Legs marching -->
+    <path d="M25 30 L20 22 L15 20" stroke="#4a7a28" stroke-width="1" fill="none" stroke-linecap="round"/>
+    <path d="M32 30 L30 21 L26 19" stroke="#4a7a28" stroke-width="1" fill="none" stroke-linecap="round"/>
+    <path d="M40 30 L41 21 L44 19" stroke="#4a7a28" stroke-width="1" fill="none" stroke-linecap="round"/>
+    <path d="M25 42 L20 50 L15 52" stroke="#4a7a28" stroke-width="1" fill="none" stroke-linecap="round"/>
+    <path d="M32 42 L30 51 L26 53" stroke="#4a7a28" stroke-width="1" fill="none" stroke-linecap="round"/>
+    <path d="M40 42 L41 51 L44 53" stroke="#4a7a28" stroke-width="1" fill="none" stroke-linecap="round"/>
+    <!-- "Flat" label -->
+    <path d="M34 20 L34 28" stroke="#d4821a" stroke-width="0.8" stroke-dasharray="2,1.5"/>
+    <text x="27" y="17" fill="#d4821a" font-size="6" font-family="monospace">DÜZGÜN/KAYNAŞIK</text>
+  </svg>`;
+}
+
+function drawHiddenPetiole() {
+  return `<svg class="anatomy-svg" width="72" height="72" viewBox="0 0 72 72">
+    <!-- Thorax -->
+    <ellipse cx="14" cy="36" rx="10" ry="8" fill="#162010" stroke="#5a9e2a" stroke-width="1.2"/>
+    <!-- Hidden petiole (covered) -->
+    <rect x="24" y="33" width="7" height="6" rx="1.5" fill="#111a0d" stroke="#3a8fb5" stroke-width="1" stroke-dasharray="2,1.5" opacity="0.5"/>
+    <!-- Abdomen covering petiole -->
+    <path d="M24 30 Q38 22 54 28 Q60 30 63 36 Q60 42 54 44 Q38 50 24 42 Z" fill="#162010" stroke="#5a9e2a" stroke-width="1.2"/>
+    <!-- Abdomen segments -->
+    <path d="M26 30 Q43 27 62 33" stroke="#2a3d1c" stroke-width="0.7" fill="none"/>
+    <path d="M25 36 Q43 34 62 36" stroke="#2a3d1c" stroke-width="0.7" fill="none"/>
+    <path d="M26 42 Q43 40 61 38" stroke="#2a3d1c" stroke-width="0.7" fill="none"/>
+    <!-- Notch at tip -->
+    <path d="M61 34 Q65 36 61 38" stroke="#3a8fb5" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    <!-- Label -->
+    <text x="30" y="18" fill="#3a8fb5" font-size="6" font-family="monospace">petiole gizli</text>
+    <text x="52" y="54" fill="#3a8fb5" font-size="6" font-family="monospace">çentik</text>
+    <path d="M58 52 L61.5 38" stroke="#3a8fb5" stroke-width="0.8" stroke-dasharray="2,1.5"/>
+  </svg>`;
+}
+
+function drawAbdomenCurve() {
+  return `<svg class="anatomy-svg" width="72" height="72" viewBox="0 0 72 72">
+    <!-- Thorax -->
+    <ellipse cx="12" cy="40" rx="9" ry="7" fill="#162010" stroke="#5a9e2a" stroke-width="1.2"/>
+    <!-- Petiole -->
+    <rect x="21" y="37" width="7" height="6" rx="1.5" fill="#111a0d" stroke="#5a9e2a" stroke-width="1"/>
+    <!-- Abdomen with curve starting at 2nd tergit -->
+    <path d="M28 36 Q36 34 44 28 Q52 22 58 26 Q64 30 63 38 Q62 46 52 48 Q42 50 32 46 Q24 44 24 40 Z" fill="#e8740a" opacity="0.85" stroke="#f0a830" stroke-width="1.2"/>
+    <!-- Segment lines on orange abdomen -->
+    <path d="M30 38 Q46 30 62 36" stroke="rgba(255,255,255,0.15)" stroke-width="0.8" fill="none"/>
+    <path d="M29 42 Q46 38 62 40" stroke="rgba(255,255,255,0.15)" stroke-width="0.8" fill="none"/>
+    <!-- Curve highlight -->
+    <path d="M36 34 Q44 28 54 27" stroke="#f5c860" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    <!-- Arrow indicating curve at 2nd tergit -->
+    <path d="M40 18 Q40 25 40 31" stroke="#f5c860" stroke-width="0.8" stroke-dasharray="2,1.5" stroke-linecap="round"/>
+    <text x="30" y="16" fill="#f5c860" font-size="6" font-family="monospace">2.tergit eğimi</text>
+    <text x="10" y="56" fill="#f5c860" font-size="6" font-family="monospace">PARLAK TURUNCU</text>
+  </svg>`;
+}
+
+function drawFusedPetiole() {
+  return `<svg class="anatomy-svg" width="72" height="72" viewBox="0 0 72 72">
+    <!-- Thorax -->
+    <ellipse cx="12" cy="36" rx="9" ry="7" fill="#162010" stroke="#5a9e2a" stroke-width="1.2"/>
+    <!-- Square head hint -->
+    <rect x="2" y="5" width="14" height="14" rx="2" fill="#162010" stroke="#7b68ee" stroke-width="1" stroke-dasharray="2,2" opacity="0.6"/>
+    <text x="3" y="14" fill="#7b68ee" font-size="5" font-family="monospace">kare kafa</text>
+    <!-- Petiole fused to gaster -->
+    <path d="M21 30 L30 30 Q32 30 32 34 L32 38 Q32 42 30 42 L21 42 Z" fill="#111a0d" stroke="#7b68ee" stroke-width="1.2"/>
+    <!-- Abdomen -->
+    <path d="M32 28 Q48 24 60 30 Q66 34 65 40 Q64 46 58 48 Q44 52 32 44 L32 28 Z" fill="#162010" stroke="#5a9e2a" stroke-width="1.2"/>
+    <!-- Fusion zone highlight -->
+    <path d="M32 30 L32 42" stroke="#7b68ee" stroke-width="1.5" stroke-dasharray="3,2"/>
+    <!-- Fusion label -->
+    <path d="M32 36 L40 20" stroke="#7b68ee" stroke-width="0.8" stroke-dasharray="2,1.5"/>
+    <text x="38" y="17" fill="#7b68ee" font-size="5.5" font-family="monospace">½ kaynaşmış!</text>
+    <!-- Long mandibles -->
+    <path d="M3 19 L1 28" stroke="#7b68ee" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M5 20 L4 29" stroke="#7b68ee" stroke-width="1.5" stroke-linecap="round"/>
+    <text x="1" y="33" fill="#7b68ee" font-size="5" font-family="monospace">uzun çene</text>
+  </svg>`;
+}
+
+// ============================================================
+//  APP STATE
+// ============================================================
+
+let state = {
+  screen: "intro",  // intro | question | result
+  currentQ: null,
+  history: [],      // [{qId, qText, shortQ, answer, answerType}]
+};
+
+// ============================================================
+//  RENDER FUNCTIONS
+// ============================================================
+
+function renderApp() {
+  const area = document.getElementById("content-area");
+  
+  if (state.screen === "intro") {
+    renderIntro(area);
+  } else if (state.screen === "question") {
+    renderQuestion(area);
+  } else if (state.screen === "result") {
+    renderResult(area);
+  }
+}
+
+function renderIntro(area) {
+  area.innerHTML = `
+    <div class="intro-screen">
+      <div class="stat-row">
+        <div class="stat-chip">
+          <div class="stat-num">7</div>
+          <div class="stat-label">Altfamilya</div>
+        </div>
+        <div class="stat-chip">
+          <div class="stat-num">6</div>
+          <div class="stat-label">Max Soru</div>
+        </div>
+        <div class="stat-chip">
+          <div class="stat-num">50+</div>
+          <div class="stat-label">Cins</div>
+        </div>
+      </div>
+
+      <div class="intro-card">
+        <div class="intro-section-title">Temel Kavramlar</div>
+        <div class="term-row">
+          <div class="term-icon">🔗</div>
+          <div class="term-content">
+            <div class="term-name">Petiole</div>
+            <div class="term-def">Thorax ile abdomen arasındaki bağlantı segmenti. Her karıncada bulunur, şekli ve varlığı altfamilyaları ayırt eder.</div>
+          </div>
+        </div>
+        <div class="term-row">
+          <div class="term-icon">🔗</div>
+          <div class="term-content">
+            <div class="term-name">Postpetiole</div>
+            <div class="term-def">Petiolenin hemen ardındaki ikinci bağlantı segmenti. Yalnızca Myrmicinae'de bulunur.</div>
+          </div>
+        </div>
+        <div class="term-row">
+          <div class="term-icon">🔬</div>
+          <div class="term-content">
+            <div class="term-name">Asit Poru (Acidopore)</div>
+            <div class="term-def">Abdomen ucundaki ters huni biçimli kıllarla çevrili delik. Yalnızca Formicinae'ye özgü!</div>
+          </div>
+        </div>
+        <div class="term-row">
+          <div class="term-icon">🐛</div>
+          <div class="term-content">
+            <div class="term-name">Koza (Cocoon)</div>
+            <div class="term-def">Pupa evresinde bazı türlerin larvaları ipek kılıfa bürünür. Kozasız pupa da koza örebilen bir türe ait olabilir.</div>
+          </div>
+        </div>
+        <div class="term-row">
+          <div class="term-icon">📡</div>
+          <div class="term-content">
+            <div class="term-name">Anten Topuzu</div>
+            <div class="term-def">Antenin ucundaki kalınlaşmış segmentler. Bazı altfamilyalarda mevcut, bazılarında yok.</div>
+          </div>
+        </div>
+        <div class="term-row">
+          <div class="term-icon">⚡</div>
+          <div class="term-content">
+            <div class="term-name">Diken (Spine)</div>
+            <div class="term-def">Thoraxın propodeum bölümündeki çift çıkıntı. Dikeni olan karınca büyük ihtimalle Myrmicinae'dir.</div>
+          </div>
+        </div>
+      </div>
+
+      <button class="start-btn" onclick="startQuiz()">
+        ▶ &nbsp; TESPITE BAŞLA
+      </button>
+    </div>
+  `;
+}
+
+function renderQuestion(area) {
+  const q = QUESTIONS[state.currentQ];
+  const totalQ = Object.keys(QUESTIONS).length;
+  const stepNum = state.history.length + 1;
+  const pct = Math.round((state.history.length / totalQ) * 100);
+
+  let breadcrumbs = "";
+  state.history.forEach((h, i) => {
+    if (i > 0) breadcrumbs += `<span class="crumb-arrow">›</span>`;
+    breadcrumbs += `<span class="crumb-item">
+      <span class="crumb-dot ${h.answerType === 'yes' ? 'active' : ''}"></span>
+      <span style="max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${h.shortQ}</span>
+    </span>`;
+  });
+  if (breadcrumbs) breadcrumbs += `<span class="crumb-arrow">›</span>`;
+  breadcrumbs += `<span class="crumb-item active"><span class="crumb-dot active"></span>${q.shortQ}</span>`;
+
+  area.innerHTML = `
+    <div class="progress-container">
+      <div class="progress-meta">
+        <span class="progress-label">İlerleme</span>
+        <span class="progress-count">${stepNum} / ${totalQ}</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" style="width:${pct}%"></div>
+      </div>
+    </div>
+
+    <div class="breadcrumb">${breadcrumbs}</div>
+
+    ${state.history.length > 0 ? `
+    <div class="back-area">
+      <button class="back-btn" onclick="goBack()">← GERİ</button>
+      <button class="restart-btn" style="margin-left:8px" onclick="restartQuiz()">↺ YENİDEN</button>
+    </div>` : `
+    <div class="back-area">
+      <button class="back-btn" onclick="goToIntro()">← BAŞA DÖN</button>
+    </div>`}
+
+    <div class="question-area" id="question-card-area">
+      <div class="question-card" id="q-card">
+        <div class="q-number">${q.num}</div>
+
+        <div class="q-icon-area">
+          <div class="q-icon-box">
+            ${q.iconSvg}
+          </div>
+        </div>
+
+        <div class="q-text">${q.title}</div>
+        <div class="q-hint">${q.hint}</div>
+
+        <div class="q-info-box">${q.info}</div>
+
+        <div class="choices-grid">
+          <button class="choice-btn yes-btn" onclick="answer('yes', this)">
+            <div class="choice-indicator">✓</div>
+            <div class="choice-content">
+              <div class="choice-label">Evet</div>
+              <div class="choice-desc">${q.yes.answer}</div>
+            </div>
+            <span class="choice-arrow">›</span>
+          </button>
+          <button class="choice-btn no-btn" onclick="answer('no', this)">
+            <div class="choice-indicator">✕</div>
+            <div class="choice-content">
+              <div class="choice-label">Hayır</div>
+              <div class="choice-desc">${q.no.answer}</div>
+            </div>
+            <span class="choice-arrow">›</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    ${state.history.length > 0 ? renderHistoryPanel() : ''}
+  `;
+}
+
+function renderHistoryPanel() {
+  if (state.history.length === 0) return '';
+  let items = state.history.map(h => `
+    <div class="history-item">
+      <span class="history-q">${h.shortQ}</span>
+      <span class="history-a ${h.answerType}">${h.answerType === 'yes' ? 'EVET' : 'HAYIR'}</span>
+    </div>
+  `).join('');
+  return `
+    <div class="history-panel">
+      <div class="history-title">Önceki cevaplar</div>
+      <div class="history-list">${items}</div>
+    </div>
+  `;
+}
+
+function renderResult(area) {
+  const sf = SUBFAMILIES[state.currentResult];
+  if (!sf) return;
+
+  // Rarity dots
+  let dots = '';
+  for (let i = 1; i <= 5; i++) {
+    const filledClass = i <= sf.rarity ? `filled ${sf.rarityType}` : '';
+    dots += `<div class="rarity-dot ${filledClass}"></div>`;
+  }
+
+  // Features
+  let featHtml = Object.entries(sf.features).map(([k, v]) =>
+    `<div class="feature-row">
+      <div class="feature-key">${k}</div>
+      <div class="feature-val">${v}</div>
+    </div>`
+  ).join('');
+
+  // Genera
+  let genHtml = sf.genera.map((g, i) =>
+    `<div class="genus-chip" style="animation-delay:${i * 0.04}s">${g}</div>`
+  ).join('');
+
+  // Answer path
+  let pathHtml = state.history.map((h, i) => `
+    <div class="history-item">
+      <span class="history-q">${h.shortQ}</span>
+      <span class="history-a ${h.answerType}">${h.answerType === 'yes' ? 'EVET' : 'HAYIR'}</span>
+    </div>
+  `).join('');
+
+  area.innerHTML = `
+    <div class="result-screen">
+      <div class="result-badge">✦ SONUÇ BULUNDU ✦</div>
+
+      <div class="result-hero">
+        <div class="result-icon">
+          <div class="result-icon-ring"></div>
+          <div class="result-icon-ring-outer"></div>
+          <svg width="80" height="80" viewBox="0 0 80 80">
+            <circle cx="40" cy="40" r="35" fill="${sf.colorDim}" stroke="${sf.color}" stroke-width="1.5"/>
+            <text x="40" y="49" text-anchor="middle" font-size="28">${sf.icon}</text>
+          </svg>
+        </div>
+
+        <div class="result-name">${sf.name}</div>
+        <div class="result-subtitle">Altfamilya · Formicidae</div>
+
+        <div class="result-tags">
+          ${sf.tags.map(t => `<span class="tag">${t}</span>`).join('')}
+          <span class="tag amber">${sf.genera.length} Cins</span>
+          <span class="tag ${sf.rarity <= 1 ? 'red' : ''}">${sf.rarityText}</span>
+        </div>
+
+        <div class="result-desc">${sf.description}</div>
+
+        <div class="rarity-bar">
+          <span class="rarity-label">Yaygınlık</span>
+          ${dots}
+          <span class="rarity-text">${sf.rarityText}</span>
+        </div>
+      </div>
+
+      <div class="features-card">
+        <div class="features-title">Morfolojik Özellikler</div>
+        <div class="features-list">${featHtml}</div>
+      </div>
+
+      <div class="genus-card">
+        <div class="genus-title">Türkiye'deki Cinsleri (${sf.genera.length})</div>
+        <div class="genus-grid">${genHtml}</div>
+      </div>
+
+      ${sf.note ? `
+      <div class="note-card">
+        <div class="note-card-title">⚠ Önemli Not</div>
+        ${sf.note}
+      </div>` : ''}
+
+      ${state.history.length > 0 ? `
+      <div class="features-card" style="animation-delay:0.45s">
+        <div class="features-title">Cevap Yolunuz</div>
+        <div class="history-list" style="gap:8px">${pathHtml}</div>
+      </div>` : ''}
+
+      <div class="result-actions">
+        <button class="action-btn primary" onclick="restartQuiz()">↺ Yeniden Tespit</button>
+        <button class="action-btn secondary" onclick="goToIntro()">📖 Rehber</button>
+      </div>
+
+      <div class="footer-note">
+        Kaynak: karincaciftligim.com · Enesersoy45 · Formicidae Türkiye
+      </div>
+    </div>
+  `;
+}
+
+// ============================================================
+//  NAVIGATION FUNCTIONS
+// ============================================================
+
+function startQuiz() {
+  state.screen = "question";
+  state.currentQ = "q1";
+  state.history = [];
+  renderApp();
+  scrollToTop();
+}
+
+function answer(type, btn) {
+  // Visual feedback
+  btn.classList.add('selected');
+  if (type === 'no') btn.classList.add('no-selected');
+
+  // Disable all buttons
+  document.querySelectorAll('.choice-btn').forEach(b => b.style.pointerEvents = 'none');
+
+  const q = QUESTIONS[state.currentQ];
+  const branch = type === 'yes' ? q.yes : q.no;
+
+  // Record history
+  state.history.push({
+    qId: state.currentQ,
+    shortQ: q.shortQ,
+    answer: branch.answer,
+    answerType: type,
+  });
+
+  // Short delay for visual feedback
+  setTimeout(() => {
+    const card = document.getElementById('q-card');
+    if (card) card.classList.add('fade-out');
+
+    setTimeout(() => {
+      const next = branch.next;
+      if (next.startsWith('result_')) {
+        const sfKey = next.replace('result_', '');
+        state.screen = "result";
+        state.currentResult = sfKey;
+        renderApp();
+      } else {
+        state.currentQ = next;
+        renderApp();
+      }
+      scrollToTop();
+    }, 280);
+  }, 220);
+}
+
+function goBack() {
+  if (state.history.length === 0) {
+    goToIntro();
+    return;
+  }
+  state.history.pop();
+  if (state.history.length === 0) {
+    state.currentQ = "q1";
+  } else {
+    // Replay to find current question
+    replayHistory();
+  }
+  state.screen = "question";
+  renderApp();
+  scrollToTop();
+}
+
+function replayHistory() {
+  let cur = "q1";
+  state.history.forEach((h, i) => {
+    if (i < state.history.length) {
+      const q = QUESTIONS[cur];
+      if (!q) return;
+      const branch = h.answerType === 'yes' ? q.yes : q.no;
+      cur = branch.next;
+    }
+  });
+  state.currentQ = cur.startsWith('result_') ? cur : cur;
+  if (cur.startsWith('result_')) {
+    state.currentQ = null;
+  }
+}
+
+function restartQuiz() {
+  state.screen = "question";
+  state.currentQ = "q1";
+  state.history = [];
+  state.currentResult = null;
+  renderApp();
+  scrollToTop();
+}
+
+function goToIntro() {
+  state.screen = "intro";
+  state.currentQ = null;
+  state.history = [];
+  state.currentResult = null;
+  renderApp();
+  scrollToTop();
+}
+
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ============================================================
+//  INIT
+// ============================================================
+renderApp();
+
+// Keyboard support
+document.addEventListener('keydown', (e) => {
+  if (state.screen !== 'question') return;
+  if (e.key === 'ArrowRight' || e.key === 'y' || e.key === 'Y' || e.key === '1') {
+    const yesBtn = document.querySelector('.yes-btn');
+    if (yesBtn && !yesBtn.style.pointerEvents) answer('yes', yesBtn);
+  }
+  if (e.key === 'ArrowLeft' || e.key === 'n' || e.key === 'N' || e.key === '2') {
+    const noBtn = document.querySelector('.no-btn');
+    if (noBtn && !noBtn.style.pointerEvents) answer('no', noBtn);
+  }
+  if (e.key === 'Backspace' || e.key === 'ArrowUp') {
+    if (state.history.length > 0) goBack();
+  }
+});
+
+// Touch swipe hints removed for cleanliness
+// Prevent double-tap zoom on buttons
+document.addEventListener('touchend', (e) => {
+  if (e.target.matches('button') || e.target.closest('button')) {
+    e.preventDefault();
+  }
+}, { passive: false });
+</script>
+</body>
+</html>
